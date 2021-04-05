@@ -41,55 +41,63 @@ def mergeSort(arr,axis):
         return S
 
 
-def findClosestPair(P):
-    N = len(P)
-    print(f'N:{N}')
+def findClosestPair(Px,Py):
+    N = len(Px)    
+    # print(f'N:{N}')
     if N<=4:
         minD = 1e4
         closestPair = None      
         for i in range(N-1):
-            (x1,y1) = P[i]
+            (x1,y1) = Px[i]
             for j in range(i+1,N):
-                (x2,y2) = P[j]
+                (x2,y2) = Px[j]
                 d = sqrt((x1-x2)**2 + (y1-y2)**2)
                 if d<minD:
                     minD = d
-                    closestPair = [P[i],P[j]]
-        print(f'minD={minD}')
-        print(f'closestPair = {closestPair}')
+                    closestPair = [Px[i],Px[j]]
+        # print(f'minD={minD}')
+        # print(f'closestPair = {closestPair}')
         return (closestPair,minD)
     
-    else:
-        Px = mergeSort(P,0)
-        Py = mergeSort(P,1)
-        L = Px[:N//2]
-        R = Px[N//2:]
-        print('Left')
-        (closestPairLeft,deltaLeft) = findClosestPair(L)
-        print(f'deltaLeft={deltaLeft}')
-        print(f'closestPairLeft = {closestPairLeft}')
+    else:        
+        Lx = Px[:N//2]
+        Rx = Px[N//2:]
+        Ly = list()
+        Ry = list()
+        (xMinLeft,xMaxLeft) = (Lx[0][0],Lx[N//2-1][0])
+        for i in range(N):
+            x = Py[i][0]
+            if xMinLeft<= x <=xMaxLeft:
+                Ly.append(Py[i])
+            else:
+                Ry.append(Py[i])        
         
-        print('Right')
-        (closestPairRight,deltaRight) = findClosestPair(R)
-        print(f'deltaRight={deltaRight}')
-        print(f'closestPairRight = {closestPairRight}')
+        # print('Left')
+        (closestPairLeft,deltaLeft) = findClosestPair(Lx,Ly)
+        # print(f'deltaLeft={deltaLeft}')
+        # print(f'closestPairLeft = {closestPairLeft}')
         
-        print('Split')
+        # print('Right')
+        (closestPairRight,deltaRight) = findClosestPair(Rx,Ry)
+        # print(f'deltaRight={deltaRight}')
+        # print(f'closestPairRight = {closestPairRight}')
+        
+        # print('Split')
         delta = min(deltaLeft,deltaRight)
-        print(f'Delta:{delta}')
+        # print(f'Delta:{delta}')
         (closestPairSplit,deltaSplit) = findClosestSplitPair(Px,Py,delta)       
-        print(f'deltaSplit={deltaSplit}')
-        print(f'closestPairSplit = {closestPairSplit}')
+        # print(f'deltaSplit={deltaSplit}')
+        # print(f'closestPairSplit = {closestPairSplit}')
 
         if deltaSplit<delta:
-            print('Here1')
+            # print('Here1')
             return (closestPairSplit,deltaSplit)
         else:
             if deltaLeft<deltaRight:
-                print('Here2')
+                # print('Here2')
                 return (closestPairLeft,deltaLeft)
             else:
-                print('Here3')
+                # print('Here3')
                 return (closestPairRight,deltaRight)
 
         
@@ -99,28 +107,28 @@ def findClosestSplitPair(Px,Py,delta):
     (minX,maxX) = (Px[N//2][0]-delta,Px[N//2][0]+delta)
     F=list()
     for p in Py:
-        if p[0]>minX and p[0]<maxX:
+        if minX<=p[0]<=maxX:
             F.append(p)
     
-    print(f'F: {F}')
+    # print(f'F: {F}')
     Nf = len(F)
-    print(f'len(F): {Nf}')
+    # print(f'len(F): {Nf}')
 
     if(Nf==1):
-        return([],1e5)
+        return([],delta)
         
         
     minD = delta
     closestPair = list()
-    for i in range(Nf-7):
+    for i in range(Nf-1):
         (x1,y1) = F[i]
-        for j in range(i+1,i+7):
-            if j < Nf:
-                (x2,y2) = F[j]
-                d = sqrt((x1-x2)**2 + (y1-y2)**2)
-                if d<minD:
-                    minD = d
-                    closestPair = [F[i],F[j]]
+        stopAt = min(i+7,Nf)
+        for j in range(i+1,stopAt):            
+            (x2,y2) = F[j]
+            d = sqrt((x1-x2)**2 + (y1-y2)**2)
+            if d<minD:
+                minD = d
+                closestPair = [F[i],F[j]]
     
     return (closestPair,minD)
                     
@@ -135,12 +143,14 @@ P=list()
 for i in range(N):
     P.append((P_array[i][0][0],P_array[i][1][0]))
 
-point = (0,0)
+point = (42,42)
 P.append(point)
 P.append(point)
 print(f' Points: {P}')
 
-# P = [(100,100),(1,1),(0,0)]
-(closestPair,closestD) = findClosestPair(P)
+Px = mergeSort(P,0)
+Py = mergeSort(P,1)
+
+(closestPair,closestD) = findClosestPair(Px,Py)
 print(f'Closest Pair: {closestPair}')
 print(f'Closest distance: {closestD}')
